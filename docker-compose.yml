@@ -1,0 +1,81 @@
+version: '3'
+
+services:
+  media-server:
+    build:
+      context: ./media-server
+      dockerfile: Dockerfile
+    networks:
+      - vision
+    ports:
+      - '8000:8000'
+      - '1935:1935'
+      - '8443:8443'
+  dashboard:
+    container_name: dashboard
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    volumes:
+      - ./dashboard:/usr/src/app/dashboard
+      - /usr/src/app/dashboard/node_modules
+    networks:
+      - vision
+    ports:
+      - '3000:3000'
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - MEDIA_SERVER=ws://media-server
+  cms:
+    container_name: cmsUI
+    build:
+      context: ./cms
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      APP_KEYS: ${APP_KEYS}
+      NODE_ENV: ${NODE_ENV}
+    volumes:
+      - ./cms:/app/cms
+      - /app/cms/node_modules
+    ports:
+      - '1337:1337'
+    networks:
+      - vision
+    depends_on:
+      - postgres
+  
+  postgres:
+    container_name: postgres
+    platform: linux/amd64 #for platform error on Apple M1 chips
+    restart: unless-stopped
+    env_file: .env
+    image: postgres:12.0-alpine
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - strapi-data:/var/lib/postgresql/data/ #using a volume
+      #- ./data:/var/lib/postgresql/data/ # if you want to use a bind folder
+    ports:
+      - '5432:5432'
+    networks:
+      - vision
+
+volumes:
+  strapi-data:
+
+networks:
+  vision:
+    name: Vision
+    driver: bridge
+      
