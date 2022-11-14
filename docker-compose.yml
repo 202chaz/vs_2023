@@ -14,11 +14,11 @@ services:
   dashboard:
     container_name: dashboard
     build:
-      context: ./dashboard
+      context: ./dashboards
       dockerfile: Dockerfile
     volumes:
-      - ./dashboard:/usr/src/app/dashboard
-      - /usr/src/app/dashboard/node_modules
+      - ./dashboards:/usr/src/app/dashboards
+      - /usr/src/app/dashboards/node_modules
     networks:
       - vision
     ports:
