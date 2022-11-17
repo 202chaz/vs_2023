@@ -11,21 +11,32 @@ services:
       - '8000:8000'
       - '1935:1935'
       - '8443:8443'
-  dashboard:
-    container_name: dashboard
+  # dashboard:
+  #   container_name: dashboard
+  #   build:
+  #     context: ./dashboards
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./dashboards:/usr/src/app/dashboards
+  #     - /usr/src/app/dashboards/node_modules
+  #   networks:
+  #     - vision
+  #   ports:
+  #     - '3000:3000'
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+  #     - MEDIA_SERVER=ws://media-server
+  detections-ui:
     build:
-      context: ./dashboards
+      context: ./br-vision-detections-ui
       dockerfile: Dockerfile
     volumes:
-      - ./dashboards:/usr/src/app/dashboards
-      - /usr/src/app/dashboards/node_modules
+      - ./app:/usr/src/app/detections
+      - /usr/src/app/detections/node_modules
     networks:
       - vision
     ports:
-      - '3000:3000'
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      - MEDIA_SERVER=ws://media-server
+      - '4200:4200'
   cms:
     container_name: cmsUI
     build:
