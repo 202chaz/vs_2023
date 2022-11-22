@@ -7,38 +7,27 @@ services:
       dockerfile: Dockerfile
     networks:
       - vision
+    volumes:
+      - ./media-server:/usr/src/app/media-server
+      - /usr/src/app/media-server/node_modules
     ports:
       - '8000:8000'
       - '1935:1935'
       - '8443:8443'
-  # dashboard:
-  #   container_name: dashboard
-  #   build:
-  #     context: ./dashboards
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ./dashboards:/usr/src/app/dashboards
-  #     - /usr/src/app/dashboards/node_modules
-  #   networks:
-  #     - vision
-  #   ports:
-  #     - '3000:3000'
-  #   environment:
-  #     - CHOKIDAR_USEPOLLING=true
-  #     - MEDIA_SERVER=ws://media-server
-  detections-ui:
+    depends_on:
+      - cms
+  dashboard:
     build:
-      context: ./br-vision-detections-ui
+      context: ./dashboard
       dockerfile: Dockerfile
     volumes:
-      - ./app:/usr/src/app/detections
-      - /usr/src/app/detections/node_modules
+      - ./dashboard:/usr/src/app/dashboard
+      - /usr/src/app/dashboard/node_modules
     networks:
       - vision
     ports:
-      - '4200:4200'
+      - '3001:3001'
   cms:
-    container_name: cmsUI
     build:
       context: ./cms
       dockerfile: Dockerfile
@@ -55,8 +44,8 @@ services:
       APP_KEYS: ${APP_KEYS}
       NODE_ENV: ${NODE_ENV}
     volumes:
-      - ./cms:/app/cms
-      - /app/cms/node_modules
+      - ./cms:/usr/src/app/cms
+      - /usr/src/app/cms/node_modules
     ports:
       - '1337:1337'
     networks:

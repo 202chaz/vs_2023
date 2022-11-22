@@ -42,7 +42,7 @@ RUN apt install -y \
                 sudo \
                 xz-utils
 
-WORKDIR /media_server
+WORKDIR /usr/src/app/media-server
 
 COPY package.json ./
 
@@ -52,6 +52,6 @@ RUN npm i npm@latest -g && \
 # add app
 COPY . .
 
-EXPOSE 8000 8443 1935
+EXPOSE 8000 8443 1935 8082
 
 CMD ["npm", "run", "start"]
